@@ -13,6 +13,7 @@ export const createCompiler = createCompilerCreator(function baseCompile (
   options: CompilerOptions
 ): CompiledResult {
   const ast = parse(template.trim(), options)
+  // 没有明确关闭优化，则优化
   if (options.optimize !== false) {
     optimize(ast, options)
   }

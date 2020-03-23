@@ -4,10 +4,12 @@ import { extend } from 'shared/util'
 import { detectErrors } from './error-detector'
 import { createCompileToFunctionFn } from './to-function'
 
+// 厉害了，创建编译器创建者，创建出来的对象是可以用来创建编译器的
 export function createCompilerCreator (baseCompile: Function): Function {
   return function createCompiler (baseOptions: CompilerOptions) {
+    // 编译动作
     function compile (
-      template: string,
+      template: string, // 模板
       options?: CompilerOptions
     ): CompiledResult {
       const finalOptions = Object.create(baseOptions)

@@ -3,7 +3,7 @@ import style from './style'
 import model from './model'
 
 export default [
-  klass,
+  klass, // 避免使用关键字
   style,
   model
 ]
