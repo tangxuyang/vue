@@ -1,13 +1,14 @@
-const path = require('path')
-const buble = require('rollup-plugin-buble')
-const alias = require('rollup-plugin-alias')
+const path = require('path') // node内建的操作文件系统路径的库
+const buble = require('rollup-plugin-buble') // buble是一个ES2015的转码器，跟babel是一个级别上的，估计没有babel应用广泛
+const alias = require('rollup-plugin-alias') // 别名插件，用来替换import中的别名
 const cjs = require('rollup-plugin-commonjs')
-const replace = require('rollup-plugin-replace')
+const replace = require('rollup-plugin-replace') // 字符串替换
 const node = require('rollup-plugin-node-resolve')
 const flow = require('rollup-plugin-flow-no-whitespace')
-const version = process.env.VERSION || require('../package.json').version
+const version = process.env.VERSION || require('../package.json').version // 当前构建的版本，以命令行传参优先级高
 const weexVersion = process.env.WEEX_VERSION || require('../packages/weex-vue-framework/package.json').version
 
+// 没啥好说的这是Vue文件中头部的版本和版权字符串
 const banner =
   '/*!\n' +
   ` * Vue.js v${version}\n` +
@@ -34,6 +35,7 @@ const resolve = p => {
   }
 }
 
+// 各种target的配置
 const builds = {
   // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
   'web-runtime-cjs-dev': {
@@ -213,12 +215,17 @@ const builds = {
   }
 }
 
+/***
+ * 使用name获取指定的配置，从上面builds中
+ */
 function genConfig (name) {
   const opts = builds[name]
+  // 这个是符合rollup的配置文件，看一遍rollup文档就知道啥意思了
   const config = {
-    input: opts.entry,
+    input: opts.entry, // 入口文件
     external: opts.external,
-    plugins: [
+    plugins: [ // 需要的插件
+      // 字符串替换插件
       replace({
         __WEEX__: !!opts.weex,
         __WEEX_VERSION__: weexVersion,
@@ -240,12 +247,16 @@ function genConfig (name) {
     }
   }
 
+  // 环境变量注入
   if (opts.env) {
+    // 直接使用replace插件替换文件中的process.env.NODE_ENV，这是用的字符串替换，注意
+    // 这里用了stringify，不用会有问题的，可以自己思考一下哦
     config.plugins.push(replace({
       'process.env.NODE_ENV': JSON.stringify(opts.env)
     }))
   }
 
+  // 如果没有明确配置了不需要转码，就用把buble放到插件列表中
   if (opts.transpile !== false) {
     config.plugins.push(buble())
   }
@@ -258,9 +269,11 @@ function genConfig (name) {
   return config
 }
 
+// 获取命令行的环境变量参数，拿其中的TARGET，这是目标，就是告诉我们要编译针对哪个环境的
 if (process.env.TARGET) {
   module.exports = genConfig(process.env.TARGET)
 } else {
+  // 没有指定TARGET的话就会编译全部的
   exports.getBuild = genConfig
   exports.getAllBuilds = () => Object.keys(builds).map(genConfig)
 }

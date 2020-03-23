@@ -1,15 +1,18 @@
-const fs = require('fs')
-const path = require('path')
-const zlib = require('zlib')
-const rollup = require('rollup')
-const terser = require('terser')
+const fs = require('fs') // node内建的文件系统模块
+const path = require('path') // node内建的路径模块
+const zlib = require('zlib') // 用来压缩的
+const rollup = require('rollup') // 没什么好说的
+const terser = require('terser') // 不知道干啥的
 
+// 保证dist目录存在
 if (!fs.existsSync('dist')) {
   fs.mkdirSync('dist')
 }
 
+// 获取全部的构建配置
 let builds = require('./config').getAllBuilds()
 
+// 根据命令行获取要构建的目标，如果没有则构建全部目标（不包括weex）
 // filter builds via command line arg
 if (process.argv[2]) {
   const filters = process.argv[2].split(',')
@@ -23,11 +26,13 @@ if (process.argv[2]) {
   })
 }
 
+// 开始构建
 build(builds)
 
 function build (builds) {
   let built = 0
   const total = builds.length
+  // 一个一个串行构建
   const next = () => {
     buildEntry(builds[built]).then(() => {
       built++
@@ -40,6 +45,7 @@ function build (builds) {
   next()
 }
 
+// 构建单个
 function buildEntry (config) {
   const output = config.output
   const { file, banner } = output
@@ -85,6 +91,7 @@ function write (dest, code, zip) {
   })
 }
 
+// 以kb的格式获取大小
 function getSize (code) {
   return (code.length / 1024).toFixed(2) + 'kb'
 }

@@ -1,5 +1,6 @@
 const path = require('path')
 
+// 转换成绝对路径
 const resolve = p => path.resolve(__dirname, '../', p)
 
 module.exports = {
