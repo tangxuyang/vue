@@ -1,5 +1,8 @@
 /* @flow */
 
+
+// 提供一些全局的帮助方法，这个跟平台是无关的，纯粹是js的内容
+
 export const emptyObject = Object.freeze({})
 
 // These helpers produce better VM code in JS engines due to their
@@ -161,6 +164,7 @@ export function cached<F: Function> (fn: F): F {
 /**
  * Camelize a hyphen-delimited string.
  */
+// 值得学习的正则
 const camelizeRE = /-(\w)/g
 export const camelize = cached((str: string): string => {
   return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
@@ -176,6 +180,7 @@ export const capitalize = cached((str: string): string => {
 /**
  * Hyphenate a camelCase string.
  */
+// 值得学习的正则
 const hyphenateRE = /\B([A-Z])/g
 export const hyphenate = cached((str: string): string => {
   return str.replace(hyphenateRE, '-$1').toLowerCase()
@@ -228,6 +233,7 @@ export function toArray (list: any, start?: number): Array<any> {
 /**
  * Mix properties into target object.
  */
+// 这个实现的还是很简陋的，好在够用
 export function extend (to: Object, _from: ?Object): Object {
   for (const key in _from) {
     to[key] = _from[key]
@@ -238,6 +244,8 @@ export function extend (to: Object, _from: ?Object): Object {
 /**
  * Merge an Array of Objects into a single Object.
  */
+// 名字不太能说明用途
+// 我觉得是不是可以叫做mergeObjectArrayToObject
 export function toObject (arr: Array<any>): Object {
   const res = {}
   for (let i = 0; i < arr.length; i++) {
@@ -272,6 +280,8 @@ export const identity = (_: any) => _
 /**
  * Generate a string containing static keys from compiler modules.
  */
+// 不知道staticKeys是干什么用的
+// 定义的模块有的确实有staticKeys这个字段，是一个字符串数组
 export function genStaticKeys (modules: Array<ModuleOptions>): string {
   return modules.reduce((keys, m) => {
     return keys.concat(m.staticKeys || [])
