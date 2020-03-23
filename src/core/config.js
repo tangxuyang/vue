@@ -1,11 +1,12 @@
 /* @flow */
-
+// 导入三个函数
 import {
-  no,
-  noop,
-  identity
+  no, // 总返回false
+  noop, // 啥也不做
+  identity // 返回第一个参数
 } from 'shared/util'
 
+// 导入生命周期数组
 import { LIFECYCLE_HOOKS } from 'shared/constants'
 
 export type Config = {
@@ -35,6 +36,7 @@ export type Config = {
   _lifecycleHooks: Array<string>;
 };
 
+// 导出Vue的配置对象
 export default ({
   /**
    * Option merge strategies (used in core/util/options)

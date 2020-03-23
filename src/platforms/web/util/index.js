@@ -1,5 +1,8 @@
 /* @flow */
 
+// 看这个文件的路径platforms/web/util/index.js
+// 说明这个是web平台下的帮助文件
+
 import { warn } from 'core/util/index'
 
 export * from './attrs'

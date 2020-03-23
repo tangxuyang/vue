@@ -6,6 +6,7 @@ export const ASSET_TYPES = [
   'filter'
 ]
 
+// 生命周期名称数组
 export const LIFECYCLE_HOOKS = [
   'beforeCreate',
   'created',

@@ -49,6 +49,12 @@ export function getTagNamespace (tag: string): ?string {
 }
 
 const unknownElementCache = Object.create(null)
+/**
+ * 判断是否是未知的元素
+ * @param {String} tag 标签名
+ * - 当前环境不在浏览器中，则是未知的标签
+ * - 保留的标签，则不是未知的标签
+ */
 export function isUnknownElement (tag: string): boolean {
   /* istanbul ignore if */
   if (!inBrowser) {
@@ -59,17 +65,23 @@ export function isUnknownElement (tag: string): boolean {
   }
   tag = tag.toLowerCase()
   /* istanbul ignore if */
+  // 有缓存直接返回
   if (unknownElementCache[tag] != null) {
     return unknownElementCache[tag]
   }
+  // 创建一个该标签的元素
   const el = document.createElement(tag)
+  // 这段逻辑我是能看懂，但是不知道这么写
+  // 如果标签名中有中划线
   if (tag.indexOf('-') > -1) {
+    // 如果这个dom的构造是HTMLUnknownElement或HTMLElement则认为是未知的元素
     // http://stackoverflow.com/a/28210364/1070244
     return (unknownElementCache[tag] = (
       el.constructor === window.HTMLUnknownElement ||
       el.constructor === window.HTMLElement
     ))
   } else {
+    // 标签名中没有中划线，则直接判断dom转换成的字符串中是否有HTMLUnknownElment字符串
     return (unknownElementCache[tag] = /HTMLUnknownElement/.test(el.toString()))
   }
 }
