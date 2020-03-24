@@ -15,6 +15,22 @@ export function initExtend (Vue: GlobalAPI) {
 
   /**
    * Class inheritance
+   * 这个方法还是有点复杂的
+   * 总结一下这个方法做了啥：
+   * - 创建Sub构造函数
+   * - Sub原型链指向以Vue.prototype为原型创建的对象，并把Sub.prototype.constructor指向Sub
+   * - Sub.options
+   * - Sub.super
+   * - Sub.cid
+   * - Sub.extend
+   * - Sub.mixin
+   * - Sub.use
+   * - Sub.component
+   * - Sub.filter
+   * - Sub.directive
+   * - Sub.superOptions
+   * - Sub.extendedOptions
+   * - Sub.sealedOptions
    */
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
@@ -30,12 +46,15 @@ export function initExtend (Vue: GlobalAPI) {
       validateComponentName(name)
     }
 
+    // 自组建的构造函数，调用了父类（Vue）的_init方法
     const Sub = function VueComponent (options) {
       this._init(options)
     }
+    // 原型链实现继承
     Sub.prototype = Object.create(Super.prototype)
     Sub.prototype.constructor = Sub
     Sub.cid = cid++
+    // 把Vue的options继承下来
     Sub.options = mergeOptions(
       Super.options,
       extendOptions
@@ -63,6 +82,7 @@ export function initExtend (Vue: GlobalAPI) {
       Sub[type] = Super[type]
     })
     // enable recursive self-lookup
+    // 递归
     if (name) {
       Sub.options.components[name] = Sub
     }

@@ -7,7 +7,7 @@ import { initExtend } from './extend'
 import { initAssetRegisters } from './assets'
 import { set, del } from '../observer/index'
 import { ASSET_TYPES } from 'shared/constants'
-import builtInComponents from '../components/index'
+import builtInComponents from '../components/index' // core内建组件只有KeepAlive
 import { observe } from 'core/observer/index'
 
 import {
@@ -18,6 +18,24 @@ import {
   defineReactive
 } from '../util/index'
 
+/**
+ * 真的是给Vue对象添加属性
+ * @param {*} Vue
+ * 总结一下都是给Vue添加了哪些属性和方法
+ * - config
+ * - util
+ * - set
+ * - delete
+ * - nextTick
+ * - obversable
+ * - options
+ * - use
+ * - mixin
+ * - extend
+ * - component
+ * - filter
+ * - directive
+ */
 export function initGlobalAPI (Vue: GlobalAPI) {
   // config
   const configDef = {}
@@ -29,6 +47,7 @@ export function initGlobalAPI (Vue: GlobalAPI) {
       )
     }
   }
+  // Vue.config
   Object.defineProperty(Vue, 'config', configDef)
 
   // exposed util methods.
@@ -52,6 +71,7 @@ export function initGlobalAPI (Vue: GlobalAPI) {
   }
 
   Vue.options = Object.create(null)
+  // components directives filters保存全局注册的这些东西
   ASSET_TYPES.forEach(type => {
     Vue.options[type + 's'] = Object.create(null)
   })
@@ -62,8 +82,8 @@ export function initGlobalAPI (Vue: GlobalAPI) {
 
   extend(Vue.options.components, builtInComponents)
 
-  initUse(Vue)
-  initMixin(Vue)
-  initExtend(Vue)
-  initAssetRegisters(Vue)
+  initUse(Vue) // 初始化Vue插件机制Vue.use
+  initMixin(Vue) // 混合机制Vue.mixin
+  initExtend(Vue) // Vue.extend
+  initAssetRegisters(Vue) // 提供注册组件、过滤器和指令的函数Vue.component、Vue.filter和Vue.directive
 }

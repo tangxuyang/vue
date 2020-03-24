@@ -49,15 +49,19 @@ export function updateComponentListeners (
   target = undefined
 }
 
+// 添加事件机制
 export function eventsMixin (Vue: Class<Component>) {
   const hookRE = /^hook:/
+  // 注册事件监听函数
   Vue.prototype.$on = function (event: string | Array<string>, fn: Function): Component {
     const vm: Component = this
     if (Array.isArray(event)) {
+      // 如果是数组，表示多个事件共用一个监听函数，所以循环调用
       for (let i = 0, l = event.length; i < l; i++) {
         vm.$on(event[i], fn)
       }
     } else {
+      // Vue实例的事件监听函数放在了_events对象中，每个类型对应一个属性，属性值是一个数组
       (vm._events[event] || (vm._events[event] = [])).push(fn)
       // optimize hook:event cost by using a boolean flag marked at registration
       // instead of a hash lookup
@@ -71,6 +75,7 @@ export function eventsMixin (Vue: Class<Component>) {
   Vue.prototype.$once = function (event: string, fn: Function): Component {
     const vm: Component = this
     function on () {
+      // 保证只调用一次
       vm.$off(event, on)
       fn.apply(vm, arguments)
     }
@@ -79,9 +84,11 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 解绑事件监听函数
   Vue.prototype.$off = function (event?: string | Array<string>, fn?: Function): Component {
     const vm: Component = this
     // all
+    // 没参数，就清空所有的事件监听函数
     if (!arguments.length) {
       vm._events = Object.create(null)
       return vm
@@ -129,6 +136,7 @@ export function eventsMixin (Vue: Class<Component>) {
         )
       }
     }
+    // 拿到指定类型的事件处理函数数组
     let cbs = vm._events[event]
     if (cbs) {
       cbs = cbs.length > 1 ? toArray(cbs) : cbs
