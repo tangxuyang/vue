@@ -50,6 +50,7 @@ function buildEntry (config) {
   const output = config.output
   const { file, banner } = output
   const isProd = /(min|prod)\.js$/.test(file)
+  // 其实这段代码的详细我是没看懂的，有疑问的，但是这个不影响我理解大概，我不想看rollup的东西了
   return rollup.rollup(config)
     .then(bundle => bundle.generate(output))
     .then(({ output: [{ code }] }) => {
