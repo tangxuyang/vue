@@ -1,20 +1,22 @@
 /* @flow */
-
+/**
+ * 虚拟节点类
+ */
 export default class VNode {
-  tag: string | void;
-  data: VNodeData | void;
-  children: ?Array<VNode>;
-  text: string | void;
-  elm: Node | void;
-  ns: string | void;
-  context: Component | void; // rendered in this component's scope
+  tag: string | void; // 标签名
+  data: VNodeData | void; // 虚拟节点数据
+  children: ?Array<VNode>; // 子节点数组
+  text: string | void; // 文本内容
+  elm: Node | void; // 对应的真实元素
+  ns: string | void; // 这个是命名空间吧
+  context: Component | void; // rendered in this component's scope 不知道这个上下文是干啥的
   key: string | number | void;
   componentOptions: VNodeComponentOptions | void;
   componentInstance: Component | void; // component instance
   parent: VNode | void; // component placeholder node
 
   // strictly internal
-  raw: boolean; // contains raw HTML? (server only)
+  raw: boolean; // contains raw HTML? (server only)命名怎么跟下面不一致，下面都是is开头的
   isStatic: boolean; // hoisted static node
   isRootInsert: boolean; // necessary for enter transition check
   isComment: boolean; // empty comment placeholder?

@@ -1,5 +1,5 @@
 /* @flow */
-
+// remove是从数组中删除指定元素的方法
 import { remove, isDef } from 'shared/util'
 
 export default {

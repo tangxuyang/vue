@@ -4,11 +4,13 @@ import VNode from '../vnode'
 import { createFnInvoker } from './update-listeners'
 import { remove, isDef, isUndef, isTrue } from 'shared/util'
 
+// 合并虚拟节点的钩子
 export function mergeVNodeHook (def: Object, hookKey: string, hook: Function) {
   if (def instanceof VNode) {
     def = def.data.hook || (def.data.hook = {})
   }
   let invoker
+  // 取出老的hook
   const oldHook = def[hookKey]
 
   function wrappedHook () {
@@ -18,6 +20,7 @@ export function mergeVNodeHook (def: Object, hookKey: string, hook: Function) {
     remove(invoker.fns, wrappedHook)
   }
 
+  // 没有老的hook
   if (isUndef(oldHook)) {
     // no existing hook
     invoker = createFnInvoker([wrappedHook])

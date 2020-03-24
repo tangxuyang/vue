@@ -29,4 +29,20 @@ export default Vue
 /**
  * Vue万物始祖
  * 这个文件定义了Vue的构造函数，给Vue的原型上添加了好多成员
+ * 我列举一下吧，全不全的先不说
+ * - _init 下划线开头的我们理解成是私有成员函数，这是调用new Vue时Vue内部调用的函数，用来初始化Vue实例的
+ * - $data 这是一个访问器，其实它最后读取的是Vue实例上的_data
+ * - $props 这也是一个访问器，最后读取的是Vue实例上的_props
+ * - $set
+ * - $delete
+ * - $watch
+ * - $on
+ * - $off
+ * - $once
+ * - $emit
+ * - _update
+ * - $forceUpdate
+ * - $destroy
+ * - $nextTick
+ * - _render
  */

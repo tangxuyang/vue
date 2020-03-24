@@ -11,6 +11,16 @@ import {
   isPlainObject
 } from 'shared/util'
 
+/**
+ * 对事件进行标准化
+ * 把字符串转换成一个对象，来表示事件
+ * name {string} 事件的名称
+ * once {boolean} 是否一次
+ * capture {boolean} 是否捕获阶段触发
+ * passive {boolean}
+ * handler {Function} 处理函数
+ * params {Array} 参数
+ */
 const normalizeEvent = cached((name: string): {
   name: string,
   once: boolean,

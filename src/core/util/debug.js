@@ -8,8 +8,11 @@ export let tip = noop
 export let generateComponentTrace = (noop: any) // work around flow check
 export let formatComponentName = (noop: any)
 
+// 非生产环境才执行
 if (process.env.NODE_ENV !== 'production') {
+  // 是不是有console
   const hasConsole = typeof console !== 'undefined'
+  // 正则表达式不想看，费脑子
   const classifyRE = /(?:^|[-_])(\w)/g
   const classify = str => str
     .replace(classifyRE, c => c.toUpperCase())
@@ -33,10 +36,13 @@ if (process.env.NODE_ENV !== 'production') {
     }
   }
 
+  // 格式化组件名
   formatComponentName = (vm, includeFile) => {
+    // 如果是跟组件，则返回<Root>
     if (vm.$root === vm) {
       return '<Root>'
     }
+    // 获取组件的选项
     const options = typeof vm === 'function' && vm.cid != null
       ? vm.options
       : vm._isVue
@@ -55,6 +61,8 @@ if (process.env.NODE_ENV !== 'production') {
     )
   }
 
+  // 这段代码很高级的
+  // 但是有点晦涩
   const repeat = (str, n) => {
     let res = ''
     while (n) {

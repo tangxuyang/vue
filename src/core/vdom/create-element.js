@@ -129,6 +129,12 @@ export function _createElement (
   }
 }
 
+/**
+ * 应用命名空间
+ * @param {*} vnode
+ * @param {*} ns
+ * @param {*} force
+ */
 function applyNS (vnode, ns, force) {
   vnode.ns = ns
   if (vnode.tag === 'foreignObject') {

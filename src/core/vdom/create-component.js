@@ -98,6 +98,14 @@ const componentVNodeHooks = {
 
 const hooksToMerge = Object.keys(componentVNodeHooks)
 
+/**
+ * 创建VNode实例
+ * @param {*} Ctor 组件构造器
+ * @param {*} data 虚拟节点数据
+ * @param {*} context 上下文
+ * @param {*} children 孩子节点
+ * @param {*} tag 标签名
+ */
 export function createComponent (
   Ctor: Class<Component> | Function | Object | void,
   data: ?VNodeData,
@@ -105,19 +113,22 @@ export function createComponent (
   children: ?Array<VNode>,
   tag?: string
 ): VNode | Array<VNode> | void {
+  // 你都没定义构造函数，让我干啥呀！！
   if (isUndef(Ctor)) {
     return
   }
 
-  const baseCtor = context.$options._base
+  const baseCtor = context.$options._base // 这个拿到的一定是Vue这个函数了
 
   // plain options object: turn it into a constructor
+  // 如果构造器是一个对象，调用Vue.extend转换成一个构造函数
   if (isObject(Ctor)) {
     Ctor = baseCtor.extend(Ctor)
   }
 
   // if at this stage it's not a constructor or an async component factory,
   // reject.
+  // 不给我构造函数让我怎么做？？
   if (typeof Ctor !== 'function') {
     if (process.env.NODE_ENV !== 'production') {
       warn(`Invalid Component definition: ${String(Ctor)}`, context)
@@ -127,6 +138,7 @@ export function createComponent (
 
   // async component
   let asyncFactory
+  // cid不存在就认为是异步组件工厂方法
   if (isUndef(Ctor.cid)) {
     asyncFactory = Ctor
     Ctor = resolveAsyncComponent(asyncFactory, baseCtor, context)
@@ -144,6 +156,7 @@ export function createComponent (
     }
   }
 
+  // 保证数据是一个对象
   data = data || {}
 
   // resolve constructor options in case global mixins are applied after
@@ -159,6 +172,7 @@ export function createComponent (
   const propsData = extractPropsFromVNodeData(data, Ctor, tag)
 
   // functional component
+  // 函数式组件
   if (isTrue(Ctor.options.functional)) {
     return createFunctionalComponent(Ctor, propsData, data, context, children)
   }
@@ -205,10 +219,12 @@ export function createComponent (
   return vnode
 }
 
+// 为一个已存在的VNode实例创建一个组件实例
 export function createComponentInstanceForVnode (
   vnode: any, // we know it's MountedComponentVNode but flow doesn't
   parent: any, // activeInstance in lifecycle state
 ): Component {
+  // 内部组件选项
   const options: InternalComponentOptions = {
     _isComponent: true,
     _parentVnode: vnode,
