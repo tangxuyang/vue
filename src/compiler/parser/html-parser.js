@@ -7,6 +7,8 @@
  * Modified by Juriy "kangax" Zaytsev
  * Original code by Erik Arvidsson, Mozilla Public License
  * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
+ * 
+ * 又见Resig哥，这是jQuery的作者呀
  */
 
 import { makeMap, no } from 'shared/util'

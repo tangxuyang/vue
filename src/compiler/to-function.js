@@ -4,11 +4,13 @@ import { noop, extend } from 'shared/util'
 import { warn as baseWarn, tip } from 'core/util/debug'
 import { generateCodeFrame } from './codeframe'
 
+// 编译的函数结果
 type CompiledFunctionResult = {
   render: Function;
   staticRenderFns: Array<Function>;
 };
 
+// 没啥说的
 function createFunction (code, errors) {
   try {
     return new Function(code)
@@ -18,6 +20,8 @@ function createFunction (code, errors) {
   }
 }
 
+// 创建从compiler到function的函数
+// 说明这个函数的返回值还是一个函数
 export function createCompileToFunctionFn (compile: Function): Function {
   const cache = Object.create(null)
 

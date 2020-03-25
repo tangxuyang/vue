@@ -10,6 +10,15 @@ const isSpecialTag = makeMap('script,style,template', true)
 
 /**
  * Parse a single-file component (*.vue) file into an SFC Descriptor Object.
+ * SFC Descriptor Object是啥？想想也知道，单文件组件有三部分组成template、script和style，所以
+ * 不外乎这三个部分
+ * {
+ *  template
+ *  script
+ *  styles
+ * }
+ * 可以看出来，template和script都是只有一个，而style可以有多个
+ * 同时还有customBlocks和errors
  */
 export function parseComponent (
   content: string,
@@ -54,11 +63,13 @@ export function parseComponent (
         type: tag,
         content: '',
         start: end,
+        // attrs从数组，转换成键值对
         attrs: attrs.reduce((cumulated, { name, value }) => {
           cumulated[name] = value || true
           return cumulated
         }, {})
       }
+      // 特殊处理template script style
       if (isSpecialTag(tag)) {
         checkAttrs(currentBlock, attrs)
         if (tag === 'style') {
@@ -75,6 +86,8 @@ export function parseComponent (
     }
   }
 
+  // 根据attrs给SFCBlock的lang、scoped、module和src赋值
+  // 可以知道ASTAttr是一个有name和value的对象
   function checkAttrs (block: SFCBlock, attrs: Array<ASTAttr>) {
     for (let i = 0; i < attrs.length; i++) {
       const attr = attrs[i]
@@ -132,3 +145,8 @@ export function parseComponent (
 
   return sfc
 }
+
+// 这个文件提供的功能是借助compiler/parser/html-parser把单文件组件
+// 用单文件组件描述符对象来表示
+// 这个描述符包括了template script 和 styles，以及customBlocks和errors
+// 太细节的逻辑我是没看懂的，比如start和end的交相呼应
