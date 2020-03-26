@@ -1,5 +1,18 @@
 /* @flow */
 
+/**
+ * 判断是否是
+ * - 浏览器
+ * - weex
+ * - ie
+ * - edge
+ * - android
+ * - ios
+ * - chrome
+ * - phantomjs
+ */
+
+
 // can we use __proto__?
 export const hasProto = '__proto__' in {}
 

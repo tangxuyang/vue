@@ -110,6 +110,7 @@ export function resolveConstructorOptions (Ctor: Class<Component>) {
       if (modifiedOptions) {
         extend(Ctor.extendOptions, modifiedOptions)
       }
+      // 根据父类的options和extendOptions来
       options = Ctor.options = mergeOptions(superOptions, Ctor.extendOptions)
       if (options.name) {
         options.components[options.name] = Ctor
