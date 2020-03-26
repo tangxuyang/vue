@@ -45,24 +45,31 @@ if (process.env.NODE_ENV !== 'production') {
 
 /**
  * Helper that recursively merges two data objects together.
+ * 合并两个对象
+ * - 目标对象里没有的，直接从源对象里拷贝过来
+ * - 目标对象有的，跟源对象不同且都是对象的，递归执行这个动作
  */
 function mergeData (to: Object, from: ?Object): Object {
+  // 没有源对象，直接把目标对象返回
   if (!from) return to
   let key, toVal, fromVal
 
+  // 收集源对象的key
   const keys = hasSymbol
     ? Reflect.ownKeys(from)
     : Object.keys(from)
 
+  // 遍历源对象每个字段，根据具体情况合并到目标对象
   for (let i = 0; i < keys.length; i++) {
     key = keys[i]
     // in case the object is already observed...
     if (key === '__ob__') continue
     toVal = to[key]
     fromVal = from[key]
+    // 目标对象中没有这个字段，把这个字段放到目标中
     if (!hasOwn(to, key)) {
       set(to, key, fromVal)
-    } else if (
+    } else if ( // 目标对象中有这个字段，说明这个字段在源对象和目标对象中都有。同时这两个都是对象的话，要递归合并了
       toVal !== fromVal &&
       isPlainObject(toVal) &&
       isPlainObject(fromVal)
@@ -83,9 +90,11 @@ export function mergeDataOrFn (
 ): ?Function {
   if (!vm) {
     // in a Vue.extend merge, both should be functions
+    // 目标值不存在，直接返回源值
     if (!childVal) {
       return parentVal
     }
+    // 源值不存在，直接返回目标值
     if (!parentVal) {
       return childVal
     }
@@ -118,6 +127,7 @@ export function mergeDataOrFn (
   }
 }
 
+// 对data字段的合并策略
 strats.data = function (
   parentVal: any,
   childVal: any,
@@ -159,6 +169,7 @@ function mergeHook (
     : res
 }
 
+// 去重
 function dedupeHooks (hooks) {
   const res = []
   for (let i = 0; i < hooks.length; i++) {
@@ -225,6 +236,7 @@ strats.watch = function (
   for (const key in childVal) {
     let parent = ret[key]
     const child = childVal[key]
+    // 父中有且不是数组的先转成数组
     if (parent && !Array.isArray(parent)) {
       parent = [parent]
     }
@@ -237,6 +249,9 @@ strats.watch = function (
 
 /**
  * Other object hashes.
+ * 简单粗暴的拷贝，先从parentVal里，再从childVal，后者的优先级高
+ * 因为知道parentVal和childVal都是对象，且不会再有嵌套，所以处理起来简单
+ * props、methods、inject、computed都是一样的策略
  */
 strats.props =
 strats.methods =
@@ -260,6 +275,7 @@ strats.provide = mergeDataOrFn
 
 /**
  * Default strategy.
+ * 默认的合并策略，不合并，优先取childVal没毛病
  */
 const defaultStrat = function (parentVal: any, childVal: any): any {
   return childVal === undefined
@@ -294,24 +310,31 @@ export function validateComponentName (name: string) {
 /**
  * Ensure all props option syntax are normalized into the
  * Object-based format.
+ * 标准化prop为对象，虽然允许我们有多种方式提供prop，但最后还是
+ * 都要转成对象的形式的
+ * {
+ *  type: xxx
+ * }
  */
 function normalizeProps (options: Object, vm: ?Component) {
   const props = options.props
+  // 没有当然直接返回了
   if (!props) return
   const res = {}
   let i, val, name
+  // 数组形式，只允许成员是字符串
   if (Array.isArray(props)) {
     i = props.length
     while (i--) {
       val = props[i]
       if (typeof val === 'string') {
-        name = camelize(val)
+        name = camelize(val) // 驼峰化
         res[name] = { type: null }
       } else if (process.env.NODE_ENV !== 'production') {
         warn('props must be strings when using array syntax.')
       }
     }
-  } else if (isPlainObject(props)) {
+  } else if (isPlainObject(props)) {// 对象形式
     for (const key in props) {
       val = props[key]
       name = camelize(key)
@@ -331,11 +354,16 @@ function normalizeProps (options: Object, vm: ?Component) {
 
 /**
  * Normalize all injections into Object-based format
+ * 标准化inject为对象
+ * {
+ *   from: xxx
+ * }
  */
 function normalizeInject (options: Object, vm: ?Component) {
   const inject = options.inject
   if (!inject) return
   const normalized = options.inject = {}
+  // 数组形式
   if (Array.isArray(inject)) {
     for (let i = 0; i < inject.length; i++) {
       normalized[inject[i]] = { from: inject[i] }
@@ -358,6 +386,11 @@ function normalizeInject (options: Object, vm: ?Component) {
 
 /**
  * Normalize raw function directives into object format.
+ * 标准化指令为对象
+ * {
+ *  bind: xxx,
+ *  update: xxx
+ * }
  */
 function normalizeDirectives (options: Object) {
   const dirs = options.directives
@@ -384,6 +417,7 @@ function assertObjectType (name: string, value: any, vm: ?Component) {
 /**
  * Merge two option objects into a new one.
  * Core utility used in both instantiation and inheritance.
+ * 这个方法在new组件实例和继承时用到
  */
 export function mergeOptions (
   parent: Object,
@@ -398,6 +432,7 @@ export function mergeOptions (
     child = child.options
   }
 
+  // 先标准化porp inject directive为对象
   normalizeProps(child, vm)
   normalizeInject(child, vm)
   normalizeDirectives(child)
@@ -406,6 +441,7 @@ export function mergeOptions (
   // but only if it is a raw options object that isn't
   // the result of another mergeOptions call.
   // Only merged options has the _base property.
+  // 合并过的options有一个_base字段的，那什么时候给这个字段赋值呢？
   if (!child._base) {
     if (child.extends) {
       parent = mergeOptions(parent, child.extends, vm)
@@ -428,7 +464,9 @@ export function mergeOptions (
     }
   }
   function mergeField (key) {
+    // 取到指定key的策略
     const strat = strats[key] || defaultStrat
+    // 实现合并
     options[key] = strat(parent[key], child[key], vm, key)
   }
   return options
@@ -451,12 +489,14 @@ export function resolveAsset (
   }
   const assets = options[type]
   // check local registration variations first
+  // 有，就返回
   if (hasOwn(assets, id)) return assets[id]
-  const camelizedId = camelize(id)
+  const camelizedId = camelize(id) // 驼峰化
   if (hasOwn(assets, camelizedId)) return assets[camelizedId]
   const PascalCaseId = capitalize(camelizedId)
   if (hasOwn(assets, PascalCaseId)) return assets[PascalCaseId]
   // fallback to prototype chain
+  // 沿着原型链往上找
   const res = assets[id] || assets[camelizedId] || assets[PascalCaseId]
   if (process.env.NODE_ENV !== 'production' && warnMissing && !res) {
     warn(
