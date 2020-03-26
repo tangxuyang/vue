@@ -53,11 +53,11 @@ export function initMixin (Vue: Class<Component>) {
     // expose real self
     vm._self = vm
     initLifecycle(vm)
-    initEvents(vm)
-    initRender(vm)
-    callHook(vm, 'beforeCreate')
+    initEvents(vm) // _events字段初始化
+    initRender(vm) //
+    callHook(vm, 'beforeCreate') // 所以在beforeCreate中不要使用内部状态的字段和方法
     initInjections(vm) // resolve injections before data/props
-    initState(vm)
+    initState(vm)// props methods data computed watch的初始化
     initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 
@@ -68,6 +68,7 @@ export function initMixin (Vue: Class<Component>) {
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
 
+    // 有el才挂载
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }
@@ -121,7 +122,7 @@ export function resolveConstructorOptions (Ctor: Class<Component>) {
 }
 
 /**
- * 记录修改过的选项
+ * 记录修改过的选项,options跟sealedOptions比较
  * 比对了options和sealedOptions
  * @param {*} Ctor
  */

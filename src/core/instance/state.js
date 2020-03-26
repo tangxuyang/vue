@@ -45,12 +45,18 @@ export function proxy (target: Object, sourceKey: string, key: string) {
   Object.defineProperty(target, key, sharedPropertyDefinition)
 }
 
+/**
+ * props methods data computed watch的顺序圈起来，要考的:)
+ * @param {*} vm
+ */
 export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
   if (opts.props) initProps(vm, opts.props)
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
+    // 所以data中可以调用methods中的方法了，因为已经执行了initMethods
+    // data中也可以引用props了，initPorps过了
     initData(vm)
   } else {
     observe(vm._data = {}, true /* asRootData */)
@@ -184,6 +190,7 @@ function initComputed (vm: Component, computed: Object) {
 
     if (!isSSR) {
       // create internal watcher for the computed property.
+      // 所以每个计算属性都有一个watcher跟它关联咯
       watchers[key] = new Watcher(
         vm,
         getter || noop,
