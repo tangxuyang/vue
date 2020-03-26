@@ -11,6 +11,7 @@ export function renderSlot (
   props: ?Object,
   bindObject: ?Object
 ): ?Array<VNode> {
+  // 作用域插槽，可以看出来作用域插槽是一个函数
   const scopedSlotFn = this.$scopedSlots[name]
   let nodes
   if (scopedSlotFn) { // scoped slot

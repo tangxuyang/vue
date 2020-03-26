@@ -17,7 +17,7 @@ import {
  * name {string} 事件的名称
  * once {boolean} 是否一次
  * capture {boolean} 是否捕获阶段触发
- * passive {boolean}
+ * passive {boolean} 我不太知道这个是干啥的
  * handler {Function} 处理函数
  * params {Array} 参数
  */
@@ -29,6 +29,7 @@ const normalizeEvent = cached((name: string): {
   handler?: Function,
   params?: Array<any>
 } => {
+  // 这样看来&~!的顺序是一定的不能乱改咯
   const passive = name.charAt(0) === '&'
   name = passive ? name.slice(1) : name
   const once = name.charAt(0) === '~' // Prefixed last, checked first
@@ -43,10 +44,16 @@ const normalizeEvent = cached((name: string): {
   }
 })
 
+/**
+ * 创建函数调用者invoker
+ * @param {*} fns
+ * @param {*} vm
+ */
 export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component): Function {
   function invoker () {
     const fns = invoker.fns
     if (Array.isArray(fns)) {
+      // 如果是数组，一个一个的调用
       const cloned = fns.slice()
       for (let i = 0; i < cloned.length; i++) {
         invokeWithErrorHandling(cloned[i], null, arguments, vm, `v-on handler`)
@@ -60,6 +67,15 @@ export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component
   return invoker
 }
 
+/**
+ * 更新监听器
+ * @param {*} on
+ * @param {*} oldOn
+ * @param {*} add
+ * @param {*} remove
+ * @param {*} createOnceHandler
+ * @param {*} vm
+ */
 export function updateListeners (
   on: Object,
   oldOn: Object,
@@ -70,7 +86,7 @@ export function updateListeners (
 ) {
   let name, def, cur, old, event
   for (name in on) {
-    def = cur = on[name]
+    def = cur = on[name] // 处理函数
     old = oldOn[name]
     event = normalizeEvent(name)
     /* istanbul ignore if */
@@ -79,6 +95,7 @@ export function updateListeners (
       event.params = def.params
     }
     if (isUndef(cur)) {
+      // 没有处理函数
       process.env.NODE_ENV !== 'production' && warn(
         `Invalid handler for event "${event.name}": got ` + String(cur),
         vm

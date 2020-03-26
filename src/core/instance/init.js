@@ -13,6 +13,7 @@ import { extend, mergeOptions, formatComponentName } from '../util/index'
 let uid = 0
 
 export function initMixin (Vue: Class<Component>) {
+  // new Vue实例的时候调用方法
   Vue.prototype._init = function (options?: Object) {
     const vm: Component = this
     // a uid
@@ -35,6 +36,8 @@ export function initMixin (Vue: Class<Component>) {
       // internal component options needs special treatment.
       initInternalComponent(vm, options)
     } else {
+      // 所以创建一个Vue实例的时候第一件事情是生成它的$options
+      // 这个没毛病，后续的动作很多都是根据这个来做的
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},
@@ -95,6 +98,8 @@ export function resolveConstructorOptions (Ctor: Class<Component>) {
   if (Ctor.super) {
     const superOptions = resolveConstructorOptions(Ctor.super)
     const cachedSuperOptions = Ctor.superOptions
+    // 为什么没变化就不根据superOptions来生成options呢？相信很多人都有这种疑问
+    // 这是因为在生成Ctor的时候，Ctor.options就已经根据父的options生成了
     if (superOptions !== cachedSuperOptions) {
       // super option changed,
       // need to resolve new options.
@@ -114,6 +119,11 @@ export function resolveConstructorOptions (Ctor: Class<Component>) {
   return options
 }
 
+/**
+ * 记录修改过的选项
+ * 比对了options和sealedOptions
+ * @param {*} Ctor
+ */
 function resolveModifiedOptions (Ctor: Class<Component>): ?Object {
   let modified
   const latest = Ctor.options

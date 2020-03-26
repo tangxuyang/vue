@@ -4,6 +4,10 @@ import { hasOwn } from 'shared/util'
 import { warn, hasSymbol } from '../util/index'
 import { defineReactive, toggleObserving } from '../observer/index'
 
+/**
+ * 计算vue实例的_provide
+ * @param {*} vm
+ */
 export function initProvide (vm: Component) {
   const provide = vm.$options.provide
   if (provide) {
@@ -13,6 +17,10 @@ export function initProvide (vm: Component) {
   }
 }
 
+/**
+ *
+ * @param {*} vm
+ */
 export function initInjections (vm: Component) {
   const result = resolveInject(vm.$options.inject, vm)
   if (result) {
@@ -29,6 +37,7 @@ export function initInjections (vm: Component) {
           )
         })
       } else {
+        // 把inject中的东西放到vm上，响应式的
         defineReactive(vm, key, result[key])
       }
     })
@@ -36,6 +45,11 @@ export function initInjections (vm: Component) {
   }
 }
 
+/**
+ * 解析注入
+ * @param {Object} inject 每一个键值对的值也是一个对象{from: ''}
+ * @param {*} vm
+ */
 export function resolveInject (inject: any, vm: Component): ?Object {
   if (inject) {
     // inject is :any because flow is not smart enough to figure out cached
@@ -50,13 +64,16 @@ export function resolveInject (inject: any, vm: Component): ?Object {
       if (key === '__ob__') continue
       const provideKey = inject[key].from
       let source = vm
+      // 沿着组件树往上走
       while (source) {
+        // 找到就停止了
         if (source._provided && hasOwn(source._provided, provideKey)) {
           result[key] = source._provided[provideKey]
           break
         }
         source = source.$parent
       }
+      // source为空说明没找到，就用默认值咯
       if (!source) {
         if ('default' in inject[key]) {
           const provideDefault = inject[key].default

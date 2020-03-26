@@ -4,6 +4,7 @@ import { isObject, isDef, hasSymbol } from 'core/util/index'
 
 /**
  * Runtime helper for rendering v-for lists.
+ * 没行到v-for实现的那么简单
  */
 export function renderList (
   val: any,
@@ -14,6 +15,7 @@ export function renderList (
   ) => VNode
 ): ?Array<VNode> {
   let ret: ?Array<VNode>, i, l, keys, key
+  // 数组跟字符串一样的处理逻辑
   if (Array.isArray(val) || typeof val === 'string') {
     ret = new Array(val.length)
     for (i = 0, l = val.length; i < l; i++) {

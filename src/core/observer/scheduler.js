@@ -12,7 +12,7 @@ import {
 
 export const MAX_UPDATE_COUNT = 100
 
-const queue: Array<Watcher> = []
+const queue: Array<Watcher> = [] // 队列
 const activatedChildren: Array<Component> = []
 let has: { [key: number]: ?true } = {}
 let circular: { [key: number]: number } = {}
@@ -22,6 +22,7 @@ let index = 0
 
 /**
  * Reset the scheduler's state.
+ * 重设调度器的状态
  */
 function resetSchedulerState () {
   index = queue.length = activatedChildren.length = 0
@@ -93,11 +94,13 @@ function flushSchedulerQueue () {
   }
 }
 
+// 触发vue实例的updated事件
 function callUpdatedHooks (queue) {
   let i = queue.length
   while (i--) {
     const watcher = queue[i]
     const vm = watcher.vm
+    // 只有当前watcher作为渲染watcher才触发updated
     if (vm._watcher === watcher && vm._isMounted && !vm._isDestroyed) {
       callHook(vm, 'updated')
     }
@@ -126,6 +129,8 @@ function callActivatedHooks (queue) {
  * Push a watcher into the watcher queue.
  * Jobs with duplicate IDs will be skipped unless it's
  * pushed when the queue is being flushed.
+ *
+ * 把watcher实例推到watcher队列中去
  */
 export function queueWatcher (watcher: Watcher) {
   const id = watcher.id

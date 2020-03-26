@@ -36,10 +36,16 @@ export function normalizeChildren (children: any): ?Array<VNode> {
       : undefined
 }
 
+// 不是注释类型的有文本内容的节点是文本节点
 function isTextNode (node): boolean {
   return isDef(node) && isDef(node.text) && isFalse(node.isComment)
 }
 
+/**
+ * 标准化数组子元素
+ * @param {*} children
+ * @param {*} nestedIndex
+ */
 function normalizeArrayChildren (children: any, nestedIndex?: string): Array<VNode> {
   const res = []
   let i, c, lastIndex, last

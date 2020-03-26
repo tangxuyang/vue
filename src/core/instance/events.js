@@ -9,6 +9,11 @@ import {
 } from '../util/index'
 import { updateListeners } from '../vdom/helpers/index'
 
+/**
+ * 初始化vue实例的_events，这是一个对象
+ * 一个键值对表示一个类型的事件的处理函数
+ * @param {*} vm
+ */
 export function initEvents (vm: Component) {
   vm._events = Object.create(null)
   vm._hasHookEvent = false

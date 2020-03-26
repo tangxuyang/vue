@@ -22,13 +22,19 @@ export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
 export function setActiveInstance(vm: Component) {
+  // 保留当前激活的组件实例为上次激活的
   const prevActiveInstance = activeInstance
   activeInstance = vm
+  // 返回一个函数，可以回退到上一个激活的实例
   return () => {
     activeInstance = prevActiveInstance
   }
 }
 
+/**
+ * 初始化组件实例生命周期相关的字段
+ * @param {*} vm
+ */
 export function initLifecycle (vm: Component) {
   const options = vm.$options
 
@@ -47,12 +53,12 @@ export function initLifecycle (vm: Component) {
   vm.$children = []
   vm.$refs = {}
 
-  vm._watcher = null
+  vm._watcher = null // 渲染watcher
   vm._inactive = null
   vm._directInactive = false
-  vm._isMounted = false
-  vm._isDestroyed = false
-  vm._isBeingDestroyed = false
+  vm._isMounted = false // 是不是已经挂载
+  vm._isDestroyed = false // 是不是销毁了
+  vm._isBeingDestroyed = false // 是不是正在销毁
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
@@ -87,6 +93,9 @@ export function lifecycleMixin (Vue: Class<Component>) {
     // updated in a parent's updated hook.
   }
 
+  /**
+   * 强制让渲染watcher进行更新
+   */
   Vue.prototype.$forceUpdate = function () {
     const vm: Component = this
     if (vm._watcher) {
@@ -94,15 +103,21 @@ export function lifecycleMixin (Vue: Class<Component>) {
     }
   }
 
+  /**
+   *
+   */
   Vue.prototype.$destroy = function () {
     const vm: Component = this
+    // 正在销毁直接返回
     if (vm._isBeingDestroyed) {
       return
     }
+    // 调用beforeDestroy生命周期函数
     callHook(vm, 'beforeDestroy')
     vm._isBeingDestroyed = true
     // remove self from parent
     const parent = vm.$parent
+    // 把当前组件从父组件中移除
     if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
       remove(parent.$children, vm)
     }
@@ -129,6 +144,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
     vm.$off()
     // remove __vue__ reference
     if (vm.$el) {
+      // 避免内存泄漏
       vm.$el.__vue__ = null
     }
     // release circular reference (#6759)
@@ -285,6 +301,11 @@ function isInInactiveTree (vm) {
   return false
 }
 
+/**
+ * 激活子组件，keep-alive相关的
+ * @param {*} vm
+ * @param {*} direct
+ */
 export function activateChildComponent (vm: Component, direct?: boolean) {
   if (direct) {
     vm._directInactive = false
@@ -303,6 +324,11 @@ export function activateChildComponent (vm: Component, direct?: boolean) {
   }
 }
 
+/**
+ *
+ * @param {*} vm
+ * @param {*} direct
+ */
 export function deactivateChildComponent (vm: Component, direct?: boolean) {
   if (direct) {
     vm._directInactive = true
@@ -319,16 +345,22 @@ export function deactivateChildComponent (vm: Component, direct?: boolean) {
   }
 }
 
+/**
+ * 调动vue实例（组件）的钩子函数
+ * @param {*} vm
+ * @param {*} hook
+ */
 export function callHook (vm: Component, hook: string) {
   // #7573 disable dep collection when invoking lifecycle hooks
   pushTarget()
-  const handlers = vm.$options[hook]
+  const handlers = vm.$options[hook] // 取到这个钩子的函数
   const info = `${hook} hook`
   if (handlers) {
     for (let i = 0, j = handlers.length; i < j; i++) {
       invokeWithErrorHandling(handlers[i], vm, null, vm, info)
     }
   }
+  // 我不知道这个是干啥的
   if (vm._hasHookEvent) {
     vm.$emit('hook:' + hook)
   }

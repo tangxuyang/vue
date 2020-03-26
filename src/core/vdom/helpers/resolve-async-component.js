@@ -25,6 +25,14 @@ function ensureCtor (comp: any, base) {
     : comp
 }
 
+/**
+ * 创建异步组件占位符
+ * @param {*} factory
+ * @param {*} data
+ * @param {*} context
+ * @param {*} children
+ * @param {*} tag
+ */
 export function createAsyncPlaceholder (
   factory: Function,
   data: ?VNodeData,
@@ -33,7 +41,7 @@ export function createAsyncPlaceholder (
   tag: ?string
 ): VNode {
   const node = createEmptyVNode()
-  node.asyncFactory = factory
+  node.asyncFactory = factory // 这个是用来获取真正组建的吧？
   node.asyncMeta = { data, context, children, tag }
   return node
 }
@@ -43,14 +51,17 @@ export function resolveAsyncComponent (
   baseCtor: Class<Component>,
   context: Component
 ): Class<Component> | void {
+  // 失败了，返回errorComp组件类
   if (isTrue(factory.error) && isDef(factory.errorComp)) {
     return factory.errorComp
   }
 
+  // 已经解析过了，直接返回解析过的组件类
   if (isDef(factory.resolved)) {
     return factory.resolved
   }
 
+  // 正在加载中返回loadingComp组件类
   if (isTrue(factory.loading) && isDef(factory.loadingComp)) {
     return factory.loadingComp
   }

@@ -4,6 +4,7 @@ import { _Set as Set, isObject } from '../util/index'
 import type { SimpleSet } from '../util/index'
 import VNode from '../vdom/vnode'
 
+// 访问过的对象集合
 const seenObjects = new Set()
 
 /**
@@ -16,14 +17,17 @@ export function traverse (val: any) {
   seenObjects.clear()
 }
 
+// 递归
 function _traverse (val: any, seen: SimpleSet) {
   let i, keys
   const isA = Array.isArray(val)
+  // 结束条件
   if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {
     return
   }
   if (val.__ob__) {
     const depId = val.__ob__.dep.id
+    // 访问过了
     if (seen.has(depId)) {
       return
     }

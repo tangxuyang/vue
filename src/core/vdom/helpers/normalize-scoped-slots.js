@@ -1,5 +1,9 @@
 /* @flow */
-
+/**
+ * 对作用域插槽进行标准化
+ * @param {Object} slots 每个属性是一个插槽，一个插槽是一个函数
+ * @param {*} normalSlots
+ */
 export function normalizeScopedSlots (
   slots: { [key: string]: Function } | void,
   normalSlots: { [key: string]: Array<VNode> }
@@ -8,6 +12,7 @@ export function normalizeScopedSlots (
   if (!slots) {
     res = {}
   } else if (slots._normalized) {
+    // 标准化过了
     return slots
   } else {
     res = {}
@@ -27,6 +32,7 @@ export function normalizeScopedSlots (
   return res
 }
 
+// 标准化一个作用域插槽
 function normalizeScopedSlot(fn: Function) {
   return scope => {
     const res = fn(scope)
