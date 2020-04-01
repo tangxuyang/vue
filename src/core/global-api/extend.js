@@ -9,12 +9,15 @@ export function initExtend (Vue: GlobalAPI) {
    * Each instance constructor, including Vue, has a unique
    * cid. This enables us to create wrapped "child
    * constructors" for prototypal inheritance and cache them.
+   *
+   * 每一个实例构造器（我称之为组件类）都有一个cid
+   * 每一个实例都有一个_uid
    */
   Vue.cid = 0
   let cid = 1
 
   /**
-   * Class inheritance
+   * Class inheritance 类继承
    * 这个方法还是有点复杂的
    * 总结一下这个方法做了啥：
    * - 创建Sub构造函数

@@ -61,17 +61,29 @@ export function initLifecycle (vm: Component) {
   vm._isBeingDestroyed = false // 是不是正在销毁
 }
 
+/**
+ * 给组件类的原型添加_update和$forceUpdate
+ * @param {*} Vue
+ */
 export function lifecycleMixin (Vue: Class<Component>) {
+  /**
+   * _update的操纵其实很简单
+   * 主要是调用vm.__patch__来把新的vnode跟就的vnode打补丁
+   * __patch__是各个移植提供的
+   */
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
+    // 保留上次的$el和_vnode
     const prevEl = vm.$el
     const prevVnode = vm._vnode
+    // 把当前组件实例作为激活的实例
     const restoreActiveInstance = setActiveInstance(vm)
     vm._vnode = vnode
     // Vue.prototype.__patch__ is injected in entry points
     // based on the rendering backend used.
     if (!prevVnode) {
       // initial render
+      // 首次渲染
       vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
     } else {
       // updates
@@ -79,10 +91,12 @@ export function lifecycleMixin (Vue: Class<Component>) {
     }
     restoreActiveInstance()
     // update __vue__ reference
+    // 防止内存泄漏
     if (prevEl) {
       prevEl.__vue__ = null
     }
     if (vm.$el) {
+      // 组件实例的dom上有一个__vue__指向的是当前组件实例
       vm.$el.__vue__ = vm
     }
     // if parent is an HOC, update its $el as well
@@ -99,12 +113,25 @@ export function lifecycleMixin (Vue: Class<Component>) {
   Vue.prototype.$forceUpdate = function () {
     const vm: Component = this
     if (vm._watcher) {
+      // 调用渲染watcher的update方法
       vm._watcher.update()
     }
   }
 
   /**
+   * 销毁的过程比较复杂
+   * 要把跟这个实例关联的对象都释放掉
+   * 1. 把当前实例从它的父实例中移除
+   * 2. 把当前实例的渲染watcher销毁掉
+   * 3. 帮当前实例的别的watcher销毁掉
+   * 4. _data.__ob__.vmCount--
+   * 5. __patch__调用
+   * 6. 移除全部的事件监听
+   * 7. $el.__vue__ = null
+   * 8. $vnode.parent = null
    *
+   * 我有一点不理解，其实计算属性还有对应的watcher，这里没有卸载
+   * _computedWatchers
    */
   Vue.prototype.$destroy = function () {
     const vm: Component = this
@@ -154,12 +181,18 @@ export function lifecycleMixin (Vue: Class<Component>) {
   }
 }
 
+/**
+ * 挂载组件
+ * @param {*} vm
+ * @param {*} el
+ * @param {*} hydrating 不知道这个字段是什么意思，英文翻译是水化合啥的
+ */
 export function mountComponent (
   vm: Component,
   el: ?Element,
   hydrating?: boolean
 ): Component {
-  vm.$el = el
+  vm.$el = el // 挂载点
   if (!vm.$options.render) {
     vm.$options.render = createEmptyVNode
     if (process.env.NODE_ENV !== 'production') {
@@ -210,6 +243,7 @@ export function mountComponent (
   // we set this to vm._watcher inside the watcher's constructor
   // since the watcher's initial patch may call $forceUpdate (e.g. inside child
   // component's mounted hook), which relies on vm._watcher being already defined
+  // 原来组件实例的渲染watcher是在这里创建的
   new Watcher(vm, updateComponent, noop, {
     before () {
       if (vm._isMounted && !vm._isDestroyed) {
@@ -217,6 +251,7 @@ export function mountComponent (
       }
     }
   }, true /* isRenderWatcher */)
+  // 在Watcher构造函数里面已经调用了updateComponent
   hydrating = false
 
   // manually mounted instance, call mounted on self
@@ -294,6 +329,11 @@ export function updateChildComponent (
   }
 }
 
+/**
+ * 判断组件实例是不是在非激活树上
+ * 从下往上找到父元素是_inactive的就返回true
+ * @param {*} vm
+ */
 function isInInactiveTree (vm) {
   while (vm && (vm = vm.$parent)) {
     if (vm._inactive) return true

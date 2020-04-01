@@ -89,4 +89,5 @@ if (process.env.NODE_ENV !== 'production') {
   }
 }
 
+// 所以说生产环境initProxy是空
 export { initProxy }

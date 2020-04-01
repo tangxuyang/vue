@@ -1,5 +1,5 @@
 /* @flow */
-
+// 资源数组filter component directive
 import { ASSET_TYPES } from 'shared/constants'
 import { isPlainObject, validateComponentName } from '../util/index'
 
@@ -25,6 +25,9 @@ export function initAssetRegisters (Vue: GlobalAPI) {
         if (process.env.NODE_ENV !== 'production' && type === 'component') {
           validateComponentName(id)
         }
+        // 组件的注册最复杂了
+        // 需要把传进来的组件options即definition转换成组件类，这个组件类都是
+        // 继承Vue的，具体过程在extend方法中。这个_base就是Vue自己
         if (type === 'component' && isPlainObject(definition)) {
           definition.name = definition.name || id
           definition = this.options._base.extend(definition)

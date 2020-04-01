@@ -1,5 +1,14 @@
 /* @flow */
 
+/**
+ * 这个文件包括了Vue的事件机制
+ * ## 事件机制
+ * 给Vue.prototype添加$on $off $once $emit
+ * ## 初始化Vue实例（包括子类实例）
+ * 给实例添加私有成员_events，这是一个对象，每个类型的事件对应
+ * 一个字段，字段名就是事件类型，值是个数组，保存所有的处理函数
+ */
+
 import {
   tip,
   toArray,
@@ -44,6 +53,12 @@ function createOnceHandler (event, fn) {
   }
 }
 
+/**
+ * 更新组件的组件实例的监听器
+ * @param {*} vm
+ * @param {*} listeners
+ * @param {*} oldListeners
+ */
 export function updateComponentListeners (
   vm: Component,
   listeners: Object,

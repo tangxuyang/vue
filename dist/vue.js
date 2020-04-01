@@ -1498,7 +1498,7 @@
     normalizeProps(child, vm);
     normalizeInject(child, vm);
     normalizeDirectives(child);
-    
+
     // Apply extends and mixins on the child options,
     // but only if it is a raw options object that isn't
     // the result of another mergeOptions call.
@@ -1912,7 +1912,7 @@
       try {
         return fn.apply(null, arguments)
       } finally {
-        useMacroTask = false;    
+        useMacroTask = false;
       }
     })
   }
@@ -2873,6 +2873,7 @@
     /* istanbul ignore if */
     if (config.performance && mark) {
       updateComponent = function () {
+        console.log('updateComponent...');
         var name = vm._name;
         var id = vm._uid;
         var startTag = "vue-perf-start:" + id;
@@ -2890,6 +2891,7 @@
       };
     } else {
       updateComponent = function () {
+        console.log('updateComponent...');
         vm._update(vm._render(), hydrating);
       };
     }

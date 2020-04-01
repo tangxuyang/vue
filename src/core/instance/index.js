@@ -16,7 +16,8 @@ function Vue (options) {
   this._init(options)
 }
 
-// 这个起名，都是用mixin结尾
+// 这个起名都是用mixin结尾
+// 给Vue.prototype上添加成员
 initMixin(Vue) // 给Vue.prototype添加_init方法,Vue._init
 stateMixin(Vue) // 给Vue.prototype添加了$props $data $set $del $watch
 eventsMixin(Vue) // 给Vue.prototype添加$on $off $once $emit，支持事件机制

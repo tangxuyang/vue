@@ -12,6 +12,11 @@ import { extend, mergeOptions, formatComponentName } from '../util/index'
 
 let uid = 0
 
+/**
+ * 给Vue.prototype添加_init方法
+ * 这是new Vue时的入口，所以事情都是它做的
+ * @param {*} Vue
+ */
 export function initMixin (Vue: Class<Component>) {
   // new Vue实例的时候调用方法
   Vue.prototype._init = function (options?: Object) {
@@ -69,6 +74,7 @@ export function initMixin (Vue: Class<Component>) {
     }
 
     // 有el才挂载
+    // core里面没有$mount这个方法，是由各个移植提供的
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

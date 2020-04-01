@@ -1494,7 +1494,7 @@ function mergeOptions (
   normalizeProps(child, vm);
   normalizeInject(child, vm);
   normalizeDirectives(child);
-  
+
   // Apply extends and mixins on the child options,
   // but only if it is a raw options object that isn't
   // the result of another mergeOptions call.
@@ -1908,7 +1908,7 @@ function withMacroTask (fn) {
     try {
       return fn.apply(null, arguments)
     } finally {
-      useMacroTask = false;    
+      useMacroTask = false;
     }
   })
 }
@@ -2862,6 +2862,7 @@ function mountComponent (
   /* istanbul ignore if */
   if (config.performance && mark) {
     updateComponent = function () {
+      console.log('updateConponent...');
       var name = vm._name;
       var id = vm._uid;
       var startTag = "vue-perf-start:" + id;
