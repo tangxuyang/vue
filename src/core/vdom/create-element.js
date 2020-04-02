@@ -139,6 +139,8 @@ function applyNS (vnode, ns, force) {
   vnode.ns = ns
   if (vnode.tag === 'foreignObject') {
     // use default namespace inside foreignObject
+    // 鬼知道foreignObject
+    // 好像是跟svg相关的
     ns = undefined
     force = true
   }
@@ -156,6 +158,8 @@ function applyNS (vnode, ns, force) {
 // ref #5318
 // necessary to ensure parent re-render when deep bindings like :style and
 // :class are used on slot nodes
+// 注册深度绑定
+// 在插槽节点上使用了像like和class的深度绑定需要确保父节点重绘
 function registerDeepBindings (data) {
   if (isObject(data.style)) {
     traverse(data.style)

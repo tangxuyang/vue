@@ -11,6 +11,7 @@ import {
 
 /**
  * 从虚拟节点数据中提取属性
+ * 它的实现思路是把VNodeData实例中的attrs和props放到组件类的options.props上去
  * @param {*} data
  * @param {*} Ctor
  * @param {*} tag
@@ -23,7 +24,9 @@ export function extractPropsFromVNodeData (
   // we are only extracting raw values here.
   // validation and default values are handled in the child
   // component itself.
+  // 只抽取原始的值
   const propOptions = Ctor.options.props
+  // 组件类没有props直接返回
   if (isUndef(propOptions)) {
     return
   }
@@ -51,6 +54,7 @@ export function extractPropsFromVNodeData (
           )
         }
       }
+      // 上面一大段都是非生产环境的，不用看
       checkProp(res, props, key, altKey, true) ||
       checkProp(res, attrs, key, altKey, false)
     }
@@ -58,7 +62,8 @@ export function extractPropsFromVNodeData (
   return res
 }
 
-// 把hash对应的key和altKey的内容拷贝到res中，preserve决定是否从hash中删除
+// 把hash中对应的key和altKey的内容拷贝到res中，
+// preserve决定是否从hash中删除
 function checkProp (
   res: Object,
   hash: ?Object,

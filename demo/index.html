@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../dist/vue.js"></script>
+</head>
+<body>
+  <div id="app">{{ msg }} - {{ msg2 }} - {{ msg3 }}</div>
+  <script>
+    var componentOptions = {
+      computed: {
+        msg3: function() {
+          return this.msg.split(' ').join('::');
+        }
+      }
+    }
+    var ComponentCtr = Vue.extend(componentOptions);
+    var vueInstance = new ComponentCtr({
+      el: '#app',
+      computed: {
+        msg2: function() {
+          return this.msg.split(' ').join(',');
+        }
+      },
+      data: function() {
+        return {
+          msg: 'hello world'
+        };
+      },
+      beforeUpdate: function() {
+        console.log('beforeUpdate');
+      },
+      updated: function() {
+        console.log('updated');
+      },
+      destroyed: function() {
+        alter('beffddd');
+      },
+      created: function() {
+      }
+    })
+
+    window.onbeforeunload = function() {
+      if (window.event) {
+        event.returnValue = 'sdf';
+      } else {
+        return 'sdf';
+      }
+    }
+  </script>
+</body>
+</html>

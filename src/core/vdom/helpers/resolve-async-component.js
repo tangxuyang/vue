@@ -13,6 +13,7 @@ import {
 
 import { createEmptyVNode } from 'core/vdom/vnode'
 
+// 这个函数大概是确保后面用到的是组件类
 function ensureCtor (comp: any, base) {
   if (
     comp.__esModule ||
@@ -46,6 +47,18 @@ export function createAsyncPlaceholder (
   return node
 }
 
+/**
+ * 解析异步组件
+ * 返回值是组件类
+ *
+ * 会返回三种组件类：
+ * - 真是的组件类
+ * - 解析错误的组件类
+ * - 正在加载的组件类
+ * @param {*} factory
+ * @param {*} baseCtor
+ * @param {*} context
+ */
 export function resolveAsyncComponent (
   factory: Function,
   baseCtor: Class<Component>,
@@ -70,10 +83,12 @@ export function resolveAsyncComponent (
     // already pending
     factory.contexts.push(context)
   } else {
+    // 为factory创建一个上下文的数组
     const contexts = factory.contexts = [context]
     let sync = true
 
     const forceRender = (renderCompleted: boolean) => {
+      // 看来每个context都是一个组件实例
       for (let i = 0, l = contexts.length; i < l; i++) {
         contexts[i].$forceUpdate()
       }
@@ -83,6 +98,7 @@ export function resolveAsyncComponent (
       }
     }
 
+    // 解析成功调用的回调
     const resolve = once((res: Object | Class<Component>) => {
       // cache resolved
       factory.resolved = ensureCtor(res, baseCtor)
@@ -93,6 +109,7 @@ export function resolveAsyncComponent (
       }
     })
 
+    // 解析失败调用的回调
     const reject = once(reason => {
       process.env.NODE_ENV !== 'production' && warn(
         `Failed to resolve async component: ${String(factory)}` +

@@ -5,7 +5,10 @@ import { createFnInvoker } from './update-listeners'
 import { remove, isDef, isUndef, isTrue } from 'shared/util'
 
 // 合并虚拟节点的钩子
+// 把新的hook跟老的hook合并
 export function mergeVNodeHook (def: Object, hookKey: string, hook: Function) {
+  // 如果是虚拟节点，从虚拟节点中抽出hook对象
+  // 保证下面操作中def是hook对象
   if (def instanceof VNode) {
     def = def.data.hook || (def.data.hook = {})
   }
@@ -13,6 +16,8 @@ export function mergeVNodeHook (def: Object, hookKey: string, hook: Function) {
   // 取出老的hook
   const oldHook = def[hookKey]
 
+  // 包装hook函数
+  // 到达调用了hook之后把它从invoker.fns中删除
   function wrappedHook () {
     hook.apply(this, arguments)
     // important: remove merged hook to ensure it's called only once

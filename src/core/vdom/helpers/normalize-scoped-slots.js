@@ -12,7 +12,7 @@ export function normalizeScopedSlots (
   if (!slots) {
     res = {}
   } else if (slots._normalized) {
-    // 标准化过了
+    // 标准化过了，就返回了
     return slots
   } else {
     res = {}
@@ -33,6 +33,8 @@ export function normalizeScopedSlots (
 }
 
 // 标准化一个作用域插槽
+// 传进来表示作用域插槽的函数，返回一个包装的函数
+// 这个包装的函数会调用传进来的函数，然后对返回值进行处理，保证返回的是数组或null
 function normalizeScopedSlot(fn: Function) {
   return scope => {
     const res = fn(scope)

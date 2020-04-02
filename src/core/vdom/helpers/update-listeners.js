@@ -46,6 +46,8 @@ const normalizeEvent = cached((name: string): {
 
 /**
  * 创建函数调用者invoker
+ * 返回值是一个用来调用函数数组的函数
+ * 把需要调用的函数数组放在返回的函数的fns字段上
  * @param {*} fns
  * @param {*} vm
  */
@@ -69,8 +71,8 @@ export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component
 
 /**
  * 更新监听器
- * @param {*} on
- * @param {*} oldOn
+ * @param {*} on 新的监听器对象
+ * @param {*} oldOn 老的监听器对象
  * @param {*} add
  * @param {*} remove
  * @param {*} createOnceHandler
@@ -85,6 +87,7 @@ export function updateListeners (
   vm: Component
 ) {
   let name, def, cur, old, event
+  // 遍历新的监听器对象
   for (name in on) {
     def = cur = on[name] // 处理函数
     old = oldOn[name]
@@ -100,7 +103,7 @@ export function updateListeners (
         `Invalid handler for event "${event.name}": got ` + String(cur),
         vm
       )
-    } else if (isUndef(old)) {
+    } else if (isUndef(old)) { // 老的监听器没有这个name的
       if (isUndef(cur.fns)) {
         cur = on[name] = createFnInvoker(cur, vm)
       }
@@ -113,6 +116,7 @@ export function updateListeners (
       on[name] = old
     }
   }
+  // 老的监听器里面有新的没有，删除
   for (name in oldOn) {
     if (isUndef(on[name])) {
       event = normalizeEvent(name)
