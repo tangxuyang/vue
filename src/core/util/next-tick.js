@@ -8,9 +8,14 @@ import { isIE, isIOS, isNative } from './env'
 const callbacks = []
 let pending = false
 
+/**
+ * 冲刷callbacks数组
+ * 依次执行其中的函数
+ */
 function flushCallbacks () {
   pending = false
   const copies = callbacks.slice(0)
+  // 清空callbacks，所以上面要用copies把callbacks保存下来
   callbacks.length = 0
   for (let i = 0; i < copies.length; i++) {
     copies[i]()
@@ -80,6 +85,11 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
   }
 }
 
+/**
+ * 
+ * @param {*} cb 
+ * @param {*} ctx 
+ */
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
   callbacks.push(() => {

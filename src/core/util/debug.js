@@ -38,7 +38,7 @@ if (process.env.NODE_ENV !== 'production') {
 
   // 格式化组件名
   formatComponentName = (vm, includeFile) => {
-    // 如果是跟组件，则返回<Root>
+    // 如果是根组件，则返回<Root>
     if (vm.$root === vm) {
       return '<Root>'
     }
